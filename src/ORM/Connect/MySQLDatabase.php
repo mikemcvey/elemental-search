@@ -37,7 +37,7 @@ class MySQLDatabase extends SS_MySQLDatabase
         $booleanSearch = false,
         $alternativeFileFilter = "",
         $invertedMatch = false
-    ) {
+    ): PaginatedList {
 
         $documentClass = SearchDocument::class;
         $fileClass = File::class;
@@ -185,7 +185,7 @@ class MySQLDatabase extends SS_MySQLDatabase
         return $list;
     }
 
-    public function generateSearchSnippet($keywords, $content)
+    public function generateSearchSnippet($keywords, $content): string
     {
         $snippetLength = 200;
         $content = str_replace('&nbsp;', ' ', $content); // &nbsp; is not playing well with spaces
@@ -196,7 +196,7 @@ class MySQLDatabase extends SS_MySQLDatabase
         $length = mb_strlen($content);
         $words = preg_split(
             '/[^\p{L}\p{N}\p{Pc}\p{Pd}@]+/u',
-            mb_strtolower((string) $keywords),
+            mb_strtolower($keywords),
             -1,
             PREG_SPLIT_NO_EMPTY
         );
@@ -232,7 +232,7 @@ class MySQLDatabase extends SS_MySQLDatabase
         return $ret;
     }
 
-    protected function findUsageBaseOnDensity($occurences)
+    protected function findUsageBaseOnDensity($occurences): int|float
     {
         if (empty($occurences)) {
             return -1;
@@ -258,7 +258,10 @@ class MySQLDatabase extends SS_MySQLDatabase
         return $start > $preOffset ? $start - $preOffset : 0;
     }
 
-    protected function findOccurrences($words, $content)
+    /**
+     * @return mixed[]
+     */
+    protected function findOccurrences($words, $content): array
     {
         $occurences = [];
         foreach ($words as $word) {

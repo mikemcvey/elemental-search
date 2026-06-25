@@ -24,19 +24,17 @@ class ElementDocumentGeneratorExtension extends SearchDocumentGenerator
     }
 
     #[Override]
-    public function onAfterWrite()
+    public function onAfterWrite(): void
     {
-        return null;
     }
 
     #[Override]
-    public function onAfterDelete()
+    public function onAfterDelete(): void
     {
-        return null;
     }
 
     #[Override]
-    public function onAfterPublish()
+    public function onAfterPublish(): void
     {
         if ($this->isThisAStandAloneClass()) {
             self::make_document_for($this->getOwner());
@@ -52,7 +50,7 @@ class ElementDocumentGeneratorExtension extends SearchDocumentGenerator
     }
 
     #[Override]
-    public function onAfterArchive()
+    public function onAfterArchive(): void
     {
         if ($this->isThisAStandAloneClass()) {
             self::delete_doc($this->getOwner());
@@ -62,7 +60,7 @@ class ElementDocumentGeneratorExtension extends SearchDocumentGenerator
         }
     }
 
-    public function makeSearchDocumentForPage()
+    public function makeSearchDocumentForPage(): void
     {
         /* @var $element BaseElement */
         $element = $this->getOwner();
@@ -72,7 +70,7 @@ class ElementDocumentGeneratorExtension extends SearchDocumentGenerator
         }
     }
 
-    private function isThisAStandAloneClass()
+    private function isThisAStandAloneClass(): bool
     {
         if (($classes = $this->getStandAloneElementClasses()) && in_array($this->getOwner()::class, $classes)) {
             return true;

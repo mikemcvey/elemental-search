@@ -24,28 +24,28 @@ use SilverStripe\View\SSViewer;
 class SearchDocument extends DataObject
 {
 
-    private static $db = [
+    private static array $db = [
         'Type' => 'Varchar(300)',
         'OriginID' => 'Int',
         'Title' => 'Text',
         'Content' => 'Text',
     ];
 
-    private static $searchable_fields = [
+    private static array $searchable_fields = [
         'Title',
         'Content',
     ];
 
-    private static $table_name = 'SearchDocument';
+    private static string $table_name = 'SearchDocument';
 
-    private static $stand_alone_search_elements = [];
+    private static array $stand_alone_search_elements = [];
 
     private static $search_x_path;
 
     /**
      * @return DataObject
      */
-    public function Origin()
+    public function Origin(): ?DataObject
     {
         return DataList::create($this->Type)->byID($this->OriginID);
     }
@@ -70,11 +70,14 @@ class SearchDocument extends DataObject
             if ($isSiteTree || $hasSearchLink) {
                 $searchLink = $origin->getGenerateSearchLink();
                 $bypassElemental = self::config()->get('use_only_x_path');
+                if (!$bypassElemental) {
+                    $bypassElemental = self::config()->get('use_only_x_path');
+                }
 
                 if (!$bypassElemental) {
                     $useElemental = false;
-                    foreach ($origin->hasOne() as $class) {
-                        if ($class == ElementalArea::class) {
+                    foreach ($origin->hasOne() as $key => $class) {
+                        if (is_a($class, ElementalArea::class, true)) {
                             $useElemental = true;
                         }
                     }
@@ -84,7 +87,7 @@ class SearchDocument extends DataObject
 
                 if ($useElemental) {
                     foreach ($origin->hasOne() as $key => $class) {
-                        if ($class !== ElementalArea::class) {
+                        if (!is_a($class, ElementalArea::class, true)) {
                             continue;
                         }
                         /** @var ElementalArea $area */
@@ -144,8 +147,8 @@ class SearchDocument extends DataObject
             }
 
             $this->Title = $origin->getTitle();
-            if ($origin->hasMethod('updateSearchContents')) {
-                $origin->updateSearchContents($contents);
+            if ($this->Origin()->hasMethod('updateSearchContents')) {
+                $this->Origin()->updateSearchContents($contents);
             }
             if ($contents) {
                 $contents = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $contents);
@@ -167,7 +170,7 @@ class SearchDocument extends DataObject
      * @param $html
      * @return string
      */
-    protected function searchXPath($xPath, $html)
+    protected function searchXPath($xPath, $html): string
     {
         $contents = '';
         if ($html) {
@@ -189,7 +192,7 @@ class SearchDocument extends DataObject
         return $contents;
     }
 
-    function removeEmptyLines($string)
+    function removeEmptyLines($string): string|array|null
     {
         return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", (string) $string);
     }

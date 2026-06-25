@@ -24,7 +24,7 @@ class SearchForm extends SS_SearchForm
     ];
 
 	#[Override]
-    public function classesToSearch($classes)
+    public function classesToSearch($classes): void
 	{
 		$supportedClasses = [SearchDocument::class, File::class];
         if(empty($classes)){

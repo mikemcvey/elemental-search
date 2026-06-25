@@ -25,45 +25,45 @@ class SearchDocumentGenerator extends Extension implements TemplateGlobalProvide
         return self::$prevent_search_documents;
     }
 
-    public static function prevent_search_documents($prevent = true)
+    public static function prevent_search_documents($prevent = true): void
     {
         self::$prevent_search_documents = $prevent;
     }
 
-    public function onAfterWrite()
+    public function onAfterWrite(): void
     {
         if(!self::is_versioned($this->getOwner()) && !self::$prevent_search_documents) {
             self::make_document_for($this->getOwner());
         }
     }
 
-    public function onAfterDelete()
+    public function onAfterDelete(): void
     {
         if(!self::is_versioned($this->getOwner())) {
             self::delete_doc($this->getOwner());
         }
     }
 
-    public function onAfterPublish()
+    public function onAfterPublish(): void
     {
         if (!self::$prevent_search_documents) {
             self::make_document_for($this->getOwner());
         }
     }
 
-    public function onAfterUnpublish()
+    public function onAfterUnpublish(): void
     {
         if ($this->getOwner()->isOnDraftOnly() && self::find_document($this->getOwner())) {
             self::delete_doc($this->getOwner());
         }
     }
 
-    public function onAfterArchive()
+    public function onAfterArchive(): void
     {
         self::delete_doc($this->getOwner());
     }
 
-    public static function make_document_for(DataObject $object)
+    public static function make_document_for(DataObject $object): void
     {
         if(self::case_create_document($object)) {
             $doc = self::find_or_make_document($object);
@@ -98,7 +98,7 @@ class SearchDocumentGenerator extends Extension implements TemplateGlobalProvide
     }
 
 
-    public static function delete_doc(DataObject $object)
+    public static function delete_doc(DataObject $object): void
     {
         $doc = self::find_document($object);
         if($doc) {

@@ -20,13 +20,13 @@ class CMSMainExtension extends Extension
 
     use Configurable;
 
-    private static $display_create_button = true;
+    private static bool $display_create_button = true;
     
-    public function updateEditForm(Form $form)
+    public function updateEditForm(Form $form): void
     {
-        $record = $this->getOwner()->getRecord($this->getOwner()->getRequest()->param('ID'));
+        $record = $this->getOwner()->getRecord($this->getOwner()->currentRecordID());
 
-        if($record && !$record->isOnDraftOnly() && self::config()->get('display_create_button')){
+        if(!$record->isOnDraftOnly() && self::config()->get('display_create_button')){
             $form->Actions()->insertAfter('action_publish',
                 FormAction::create('makeSearch', 'Create Search Doc')
                     ->setUseButtonTag(true)
@@ -39,7 +39,7 @@ class CMSMainExtension extends Extension
     {
         /* @var $owner CMSMain */
         $owner = $this->getOwner();
-        $id = $owner->getRequest()->param('ID');
+        $id = $owner->currentRecordID();
         $record = $owner->getRecord($id);
         if($record) {
             SearchDocumentGenerator::make_document_for($record);

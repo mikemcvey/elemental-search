@@ -22,7 +22,7 @@ class FulltextSearchable extends Extension
 
     protected static $searchable_classes;
 
-    public static function enable($searchableClasses = [SearchDocument::class, File::class])
+    public static function enable($searchableClasses = [SearchDocument::class, File::class]): void
     {
         $defaultColumns = [
             SearchDocument::class => ['Title', 'Content'],

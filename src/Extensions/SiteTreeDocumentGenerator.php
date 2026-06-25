@@ -9,7 +9,6 @@
 
 namespace SilverStripers\ElementalSearch\Extensions;
 
-use Exception;
 use Override;
 use SilverStripe\Control\Director;
 use SilverStripe\Versioned\Versioned;
@@ -18,19 +17,17 @@ class SiteTreeDocumentGenerator extends SearchDocumentGenerator
 {
 
     #[Override]
-    public function onAfterWrite()
+    public function onAfterWrite(): void
     {
-        return null;
     }
 
     #[Override]
-    public function onAfterDelete()
+    public function onAfterDelete(): void
     {
-        return null;
     }
 
     #[Override]
-    public function onAfterPublish()
+    public function onAfterPublish(): void
     {
         self::make_document_for($this->getOwner());
     }
@@ -41,7 +38,7 @@ class SiteTreeDocumentGenerator extends SearchDocumentGenerator
     }
 
     #[Override]
-    public function onAfterArchive()
+    public function onAfterArchive(): void
     {
         self::delete_doc($this->getOwner());
     }

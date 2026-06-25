@@ -10,74 +10,66 @@
 namespace SilverStripers\ElementalSearch\Tasks;
 
 
-use Exception;
 use Override;
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\PolyExecution\PolyOutput;
+use Symfony\Component\Console\Command\Command;
 use SilverStripe\Control\Director;
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripers\ElementalSearch\Extensions\SearchDocumentGenerator;
 use SilverStripers\ElementalSearch\Extensions\SiteTreeDocumentGenerator;
-use Symfony\Component\Console\Input\InputInterface;
 
 class GenerateSearchDocument extends BuildTask
 {
+
     protected string $title = 'Re-generate all search documents';
 
     protected static string $description = 'Generate search documents for items.';
 
-    private static string $segment = 'make-search-docs';
+    protected static string $commandName = 'make-search-docs';
 
     /**
-     * @param InputInterface $input
-     * @param PolyOutput $output
-     * @return int Return code (0 for success, 1 for error)
+     * Implement this method in the task subclass to
+     * execute via the TaskRunner
+     *
+     * @param HTTPRequest $request
+     * @return
      */
     #[Override]
-    public function run(InputInterface $input, PolyOutput $output): int
-    {
-        return $this->execute($input, $output);
-    }
-
-    /**
-     * @param InputInterface $input
-     * @param PolyOutput $output
-     * @return int Return code (0 for success, 1 for error)
-     */
-    public function execute(InputInterface $input, PolyOutput $output): int
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         $eol = Director::is_cli() ? PHP_EOL . PHP_EOL : '<br>';
         set_time_limit(50000);
         $classes = $this->getAllSearchDocClasses();
-        
         foreach ($classes as $class) {
             foreach ($list = DataList::create($class) as $record) {
-                $message = sprintf(
-                    'Making record for %s type %s, link %s',
-                    $record->getTitle(),
-                    $record->ClassName,
-                    ClassInfo::hasMethod($record, 'getGenerateSearchLink') ? $record->getGenerateSearchLink() : $record->Title
-                );
+				$output = sprintf(
+						'Making record for %s type %s, link %s',
+						$record->getTitle(),
+						$record->ClassName,
+						ClassInfo::hasMethod($record, 'getGenerateSearchLink') ? $record->getGenerateSearchLink() : $record->Title);
 
-                $message .= $eol;
-                echo $message;
+                $output .= $eol;
 
-                try {
-                    SearchDocumentGenerator::make_document_for($record);
-                } catch (Exception $e) {
-                    $output->writeln('Error processing record ' . $record->ID . ': ' . $e->getMessage());
-                    return 1; // Return error code
-                }
+                echo $output;
+				try {
+					SearchDocumentGenerator::make_document_for($record);
+				} catch (Exception) {
+				}
             }
         }
-        
-        echo 'Completed' . $eol;
-        return 0; // Success
+        $output->writeln('Completed');
+        return Command::SUCCESS;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getAllSearchDocClasses(): array
     {
         $list = [];
